@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-# Configuração do CORS para permitir requisições de qualquer origem.
 CORS(app)
 
 # --- CONFIGURAÇÃO DA API DO GEMINI ---
@@ -55,7 +54,6 @@ class LegacyEmailClassifier:
         else:
             suggested_response = "Obrigado pela sua mensagem! Desejamos a você também um excelente dia."
 
-        # Retorna uma estrutura compatível com o frontend
         return {
             "category": category,
             "confidence": confidence,
@@ -142,7 +140,7 @@ def process_email_request(email_text, model='gemini', filename=None):
 def index():
     return jsonify({"message": "API de Classificação de E-mails está rodando"})
 
-@app.route('/classify', methods=['POST'])
+@app.route('/api/classify', methods=['POST'])
 def classify_email_route():
     try:
         data = request.get_json()
@@ -157,14 +155,14 @@ def classify_email_route():
     except Exception as e:
         return jsonify({"error": f"Erro no processamento: {str(e)}"}), 500
 
-@app.route('/classify-file', methods=['POST'])
+@app.route('/api/classify-file', methods=['POST'])
 def classify_file_route():
     try:
         if 'file' not in request.files:
             return jsonify({"error": "Nenhum arquivo enviado"}), 400
         
         file = request.files['file']
-        model_choice = request.form.get('model', 'gemini') # Pega o modelo do form-data
+        model_choice = request.form.get('model', 'gemini')
         
         if file.filename.endswith('.pdf'):
             email_text = extract_text_from_pdf(file)
@@ -181,4 +179,3 @@ def classify_file_route():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
